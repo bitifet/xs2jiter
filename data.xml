@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <test>
+        <e/><!-- "e": null -->
+        <e>Text Data no attributes</e><!-- "e": "Text Data no attributes" -->
+        <e name="Attribute Value Only" /><!-- "e":{"@name": "Attribute Value Only"} -->
+        <e name="Attribute Value">Text having attributes</e><!-- "e": { "@name": "value", "#text": "text" } -->
+        <e> <a>a Item text</a> <b>b Item text</b> </e><!-- "e": { "a": "a Item text", "b": "b Item text" } -->
+        <e> <a>a Arr Elment 1</a> <a>a Arr Elment 2</a> </e><!-- "e": { "a": ["a Arr Elment 1", "a Arr Elment 2"] } -->
+        <e> Text with... <a>a element</a> </e><!-- "e": { "#text": "text", "a": "text" } -->
+    </test>
+</document>

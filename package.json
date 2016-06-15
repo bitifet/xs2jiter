@@ -1,0 +1,29 @@
+{
+  "name": "parsexml",
+  "version": "0.0.0",
+  "description": "Convert XML to JSON according to http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitifet/parsexml.git"
+  },
+  "keywords": [
+    "xml",
+    "json",
+    "xml2json",
+    "parser",
+    "xmlparser"
+  ],
+  "author": "Joan Miquel Torres <jmtorres@112ib.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/bitifet/parsexml/issues"
+  },
+  "homepage": "https://github.com/bitifet/parsexml#readme",
+  "dependencies": {
+    "node-expat": "^2.3.13"
+  }
+}
