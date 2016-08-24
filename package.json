@@ -1,14 +1,14 @@
 {
-  "name": "parsexml",
+  "name": "x2ajs",
   "version": "0.0.0",
-  "description": "Convert XML to JSON according to http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html",
+  "description": "XML to Asynchronous JSON Stream - Convert XML to JSON in complete chunks.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bitifet/parsexml.git"
+    "url": "git+https://github.com/bitifet/x2ajs.git"
   },
   "keywords": [
     "xml",
@@ -20,10 +20,13 @@
   "author": "Joan Miquel Torres <jmtorres@112ib.com>",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/bitifet/parsexml/issues"
+    "url": "https://github.com/bitifet/x2ajs/issues"
   },
-  "homepage": "https://github.com/bitifet/parsexml#readme",
+  "homepage": "https://github.com/bitifet/x2ajs#readme",
   "dependencies": {
+    "abuffer": "0.0.1",
+    "deasync": "^0.1.7",
+    "extend": "^3.0.0",
     "node-expat": "^2.3.13"
   }
 }
