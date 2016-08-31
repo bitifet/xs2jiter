@@ -52,9 +52,10 @@ Conversion to JSON is done following the specification of
 [converting-between-xml-and-json.html](http://www.xml.com/pub/a/2006/05/31/converting-between-xml-and-json.html)
 
 
-> **NOTE:** The only change I did was adding a "@" attribute at tot level of each object
-> with the tag name.  This way, even XMLs with mixed tag types can be parsed
-> distinguishing each tag type.
+> **NOTE:** The only change I did was adding a "@" attribute at tot level of
+> each object with the tag name. This way, even XMLs with mixed tag types can
+> be parsed distinguishing each tag type. In case of arrays, it is created as
+> non enumerable property to not broke its behaviour.
 
 
 

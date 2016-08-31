@@ -90,7 +90,7 @@ function x2j(xml, bufferMaxLength){
             return header.set([name, attrs]);
         case 2:
             // Don't preserve top level elements.
-            // ...but let's create currElement instance to collect inner data.
+            // ...but let's create currElem instance to collect inner data.
             break;
         default:
             if (
@@ -150,11 +150,19 @@ function x2j(xml, bufferMaxLength){
                 ) currElem.target = currElem.target[finalKeys[0]]; // Collapse (avoiding unnecessary sublevels.
             };//}}}
 
-            if (deep == 2) { // Label top element tag name as "@"//{{{
-                buffer.unshift(
-                    oextend({"@": currElem.name}, currElem.target)
-                );
-            };//}}}
+            if (deep == 2) { // Top elemnt tag:
+                // Label tag name as "@" (except for arrays):
+                if (! (currElem.target instanceof Array)) {
+                    currElem.target = oextend({"@": currElem.name}, currElem.target);
+                } else {
+                    Object.defineProperty(currElem.target, "@", {
+                        enumerable: false,
+                        value: currElem.name,
+                    });
+                };
+                // Output it:
+                buffer.unshift(currElem.target);
+            };
 
             currElem = stack.pop();
 
