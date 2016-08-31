@@ -1,9 +1,8 @@
-// x2ajs - index.js
+// xs2jiter - index.js
 // ================
 // 
-// XML to Asynchronous JSON Stream
-//
-// -- Convert XML to JSON in complete chunks.
+// XML Stream to JSON Iterator
+// -- Convert XML to JSON and iterate over its // top-level elements.
 //
 // Expects structured data codified in xml:
 //
@@ -31,7 +30,7 @@ var abuffer = require("abuffer");
 var deasync = require("deasync");
 var Stream = require("stream");
 
-function parseXml(xml, bufferMaxLength){
+function x2j(xml, bufferMaxLength){
 
     bufferMaxLength || (bufferMaxLength = 50);
     var deep = 0; // Currenly parsing tag deep level:
@@ -185,7 +184,7 @@ function parseXml(xml, bufferMaxLength){
             throw err;
         });
     } else {
-        parser.write(xml);
+        parser.write(String(xml));
     };
     // ----------------------
 
@@ -194,4 +193,4 @@ function parseXml(xml, bufferMaxLength){
 
 };
 
-module.exports = parseXml;
+module.exports = x2j;
