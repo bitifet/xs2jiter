@@ -29,6 +29,7 @@ var expat = require('node-expat');
 var parser = new expat.Parser('UTF-8');
 var abuffer = require("abuffer");
 var deasync = require("deasync");
+var Stream = require("stream");
 
 function parseXml(xml, bufferMaxLength){
 
@@ -178,10 +179,17 @@ function parseXml(xml, bufferMaxLength){
 
     // Start parsing process:
     // ----------------------
-    parser.write(xml);
+    if (xml instanceof Stream) {
+        xml.on("data", parser.write.bind(parser));
+        xml.on("error", function(err) {
+            throw err;
+        });
+    } else {
+        parser.write(xml);
+    };
     // ----------------------
 
-    // Returns (iterable) buffer interface wiht header property:
+    // Returns (iterable) buffer interface with header property:
     return buffer;
 
 };
