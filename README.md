@@ -1,7 +1,11 @@
 xs2jIter
 ========
 
-> XML Stream to JSON Iterator - Convert XML to JSON and iterate over its top-level elements.
+> XML Stream to JSON Iterator
+
+
+> Convert XML to JSON and iterate over its top-level elements.
+
 
 XML is a polymorphic data format able to mix multiple kinds of data with
 different structures in a single file (or stream). But, in fact, it is often
@@ -65,7 +69,7 @@ Usage
 ### Syntax
 
     var x2j = require("xs2jiter");
-    var data = x2j(xml);
+    var data = x2j(xml [, maxBufferLength]);
         // data        -> Iterable (once) over the whole items.
         // data.header -> Header information (container tag attributes).
 
@@ -73,6 +77,13 @@ Usage
 **Parameters:**
 
   * *xml:* XML stream or string.
+  * *maxBufferLength:* Specify the internal elements buffer length (Default is 50).
+
+> **NOTE:** Default value for *maxBufferLength* will be usually fine. But lower
+> values may help to limit memory usage when having big objects.
+> 
+> On the other hand, greater values may increase speed if your parsing time
+> varies (typically because too different object lengths)
 
 
 **Return value:** Singleton iterable with *header* property.

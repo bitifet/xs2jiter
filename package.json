@@ -1,6 +1,6 @@
 {
   "name": "xs2jiter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "XML Stream to JSON Iterator - Convert XML to JSON and iterate over its top-level elements.",
   "main": "index.js",
   "scripts": {
