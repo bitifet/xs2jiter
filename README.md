@@ -75,7 +75,7 @@ Usage
         // data.header -> Header information (container tag attributes).
 
 
-**Parameters:**
+#### Parameters:
 
   * *xml:* XML stream or string.
   * *maxBufferLength:* Specify the internal elements buffer length (Default is 50).
@@ -87,7 +87,51 @@ Usage
 > varies (typically because too different object lengths)
 
 
-**Return value:** Singleton iterable with *header* property.
+#### Return value
+
+Singleton iterable with *header* property.
+
+    for (var j of data) {...};
+
+...but it has also additional interesting properties and methods:
+
+
+##### header
+
+Header information (attributes of the document container tag).
+
+
+##### map()
+
+Array-like .map() method.
+
+> It is also handy shorthand to convert returned iterable into an array (See
+> *Arguments* below).
+
+
+**Syntax:**
+
+    var myArr = data.map([cbk [, discard]]);
+
+
+**Arguments:**
+
+  * *cbk*: Transformation callback. If undefined, an unfiltered array will be
+  retrieved.
+
+  * *discard*: If set to true (and cbk is specified), returns empty array. This
+  avoid wasting memory with huge input streams while we only want to execute
+  the callback but doesn't want the result.
+
+
+##### filter()
+
+Array-like .filter() method.
+
+**Syntax:**
+
+    var myArr = data.filter(cbk);
+
 
 
 ### Example
@@ -107,4 +151,22 @@ Usage
     };
 
 
+
+
+<a name="contributing"></a>Contributing
+---------------------------------------
+
+If you are interested in contributing with this project, you can do it in many ways:
+
+  * Creating and/or mantainig documentation.
+
+  * Implementing new features or improving code implementation.
+
+  * Reporting bugs and/or fixing it.
+  
+  * Sending me any other feedback.
+
+  * Whatever you like...
+    
+Please, contact-me, open issues or send pull-requests thought [this project GIT repository](https://github.com/bitifet/xs2jiter)
 
