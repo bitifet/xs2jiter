@@ -40,9 +40,10 @@ function x2j(xml, bufferMaxLength){
         //      >=3 => Inner tags.
     var currElem; // Currently parsing tag data.
     var stack = []; // Tag data stack.
+    var stopped = false;
 
-    // I/O Buffer (return value) initialization:
-    // -----------------------------------------
+    // I/O Buffers initialization:
+    // ---------------------------
     var header = (function(){ // Simple header async storage//{{{
         var setter;
         var getter = new Promise(function(resolve, reject){
@@ -53,12 +54,21 @@ function x2j(xml, bufferMaxLength){
             get: getter,
         };
     })();//}}}
-    var buffer = new abuffer({ // Actual buffer initialization//{{{
+    var ibuffer = [];
+    var obuffer = new abuffer({ // Actual obuffer initialization//{{{
         maxLength: bufferMaxLength,
-        stop: function(){return parser.stop();},
-        resume: function(){return parser.resume();},
+        stop: function(){
+            stopped = true;
+            return parser.stop();
+        },
+        resume: function(){
+            ibuffer.map(parser.write.bind(parser));
+            ibuffer = [];
+            stopped = false;
+            return parser.resume();
+        },
     });//}}}
-    Object.defineProperty(buffer, "header", { // Adds header property (getter)//{{{
+    Object.defineProperty(obuffer, "header", { // Adds header property (getter)//{{{
         enumerable: false,
         configurable: false,
         get: function get_header() {//{{{
@@ -77,25 +87,25 @@ function x2j(xml, bufferMaxLength){
             return data;
         },//}}}
     });//}}}
-    Object.defineProperty(buffer, "map", { // Array-like map() method//{{{
+    Object.defineProperty(obuffer, "map", { // Array-like map() method//{{{
         enumerable: false,
         configurable: false,
         value: function arrayLike_map(cbk, discard) {//{{{
-            if (cbk === undefined) return Array.from(buffer); // Without callback argument returns Array of all (remaining) elements.
+            if (cbk === undefined) return Array.from(obuffer); // Without callback argument returns Array of all (remaining) elements.
             var retv = [];
-            for (let item of buffer) {
+            for (let item of obuffer) {
                 item = cbk(item);
                 if (! discard) retv.push(item);
             };
             return retv;
         },//}}}
     });//}}}
-    Object.defineProperty(buffer, "filter", { // Array-like filter() method//{{{
+    Object.defineProperty(obuffer, "filter", { // Array-like filter() method//{{{
         enumerable: false,
         configurable: false,
         value: function arrayLike_filter(cbk) {//{{{
             var retv = [];
-            for (let item of buffer) {
+            for (let item of obuffer) {
                 if (cbk(item)) retv.push(item);
             };
             return retv;
@@ -185,14 +195,14 @@ function x2j(xml, bufferMaxLength){
                     });
                 };
                 // Output it:
-                buffer.unshift(currElem.target);
+                obuffer.unshift(currElem.target);
             };
 
             currElem = stack.pop();
 
         };
 
-        if (! --deep) buffer.eof(true); // First level (document) tag closed.
+        if (! --deep) obuffer.eof(true); // First level (document) tag closed.
 
     });//}}}
     parser.on('text', function (text) {//{{{
@@ -211,7 +221,13 @@ function x2j(xml, bufferMaxLength){
     // Start parsing process:
     // ----------------------
     if (xml instanceof Stream) {
-        xml.on("data", parser.write.bind(parser));
+        xml.on("data", function (data){
+            if (stopped) {
+                ibuffer.push(data);
+            } else {
+                parser.write(data);
+            };
+        });
         xml.on("error", function(err) {
             throw err;
         });
@@ -220,8 +236,8 @@ function x2j(xml, bufferMaxLength){
     };
     // ----------------------
 
-    // Returns (iterable) buffer interface with header property:
-    return buffer;
+    // Returns (iterable) obuffer interface with header property:
+    return obuffer;
 
 };
 
