@@ -101,36 +101,18 @@ Singleton iterable with *header* property.
 Header information (attributes of the document container tag).
 
 
-##### map()
-
-Array-like .map() method.
-
-> It is also handy shorthand to convert returned iterable into an array (See
-> *Arguments* below).
 
 
-**Syntax:**
+#### Array-Like methods:
 
-    var myArr = data.map([cbk [, discard]]);
+Following array-like methods are also supprted. They work like its Array
+equivalents but returns an iterator instead of an array. For more information
+see [abuffer](https://www.npmjs.com/package/abuffer#array-like-methods)
+documentation.
 
+  * buff.map(cbk [, thisArg])
 
-**Arguments:**
-
-  * *cbk*: Transformation callback. If undefined, an unfiltered array will be
-  retrieved.
-
-  * *discard*: If set to true (and cbk is specified), returns empty array. This
-  avoid wasting memory with huge input streams while we only want to execute
-  the callback but doesn't want the result.
-
-
-##### filter()
-
-Array-like .filter() method.
-
-**Syntax:**
-
-    var myArr = data.filter(cbk);
+  * buff.filter(cbk [,thisArg])
 
 
 

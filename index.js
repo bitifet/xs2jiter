@@ -87,30 +87,6 @@ function x2j(xml, bufferMaxLength){
             return data;
         },//}}}
     });//}}}
-    Object.defineProperty(obuffer, "map", { // Array-like map() method//{{{
-        enumerable: false,
-        configurable: false,
-        value: function arrayLike_map(cbk, discard) {//{{{
-            if (cbk === undefined) return Array.from(obuffer); // Without callback argument returns Array of all (remaining) elements.
-            var retv = [];
-            for (let item of obuffer) {
-                item = cbk(item);
-                if (! discard) retv.push(item);
-            };
-            return retv;
-        },//}}}
-    });//}}}
-    Object.defineProperty(obuffer, "filter", { // Array-like filter() method//{{{
-        enumerable: false,
-        configurable: false,
-        value: function arrayLike_filter(cbk) {//{{{
-            var retv = [];
-            for (let item of obuffer) {
-                if (cbk(item)) retv.push(item);
-            };
-            return retv;
-        },//}}}
-    });//}}}
     // -----------------------------------------
 
     // Parser event handlers:
