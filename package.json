@@ -1,8 +1,8 @@
 {
   "name": "xs2jiter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "XML Stream to JSON Iterator - Convert XML to JSON and iterate over its top-level elements.",
-  "main": "index.js",
+  "main": "bin/xs2jiter.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,9 +24,11 @@
   },
   "homepage": "https://github.com/bitifet/xs2jiter#readme",
   "dependencies": {
-    "abuffer": "0.0.2",
+    "abuffer": "0.0.4",
+    "commander": "^2.9.0",
     "deasync": "^0.1.7",
     "extend": "^3.0.0",
+    "inspectorslack": "0.0.2",
     "node-expat": "^2.3.13"
   }
 }

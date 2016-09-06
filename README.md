@@ -62,12 +62,71 @@ Conversion to JSON is done following the specification of
 Usage
 -----
 
-### Install
+
+### <a name="asaclitool"></a>As a command-line tool
+
+Even designed as a javascript library to handle large XML files asynchronously
+(see [usage as a library](#asalibrary)) xs2jiter can also be used as command
+line tool for data analysis and inspection purposes or as input for non
+javascript languages.
+
+#### Install
+
+    npm install -g xs2jiter
+
+
+#### Console Usage
+
+    $ xs2jiter -h
+
+      Usage: xs2jiter [options] [ inputFile ] [, outputFile ]
+
+      XML Stream to JSON Iterator - Convert XML to JSON and iterate over its top-level elements.
+
+      Options:
+
+        -h, --help                output usage information
+        -V, --version             output the version number
+        -i --inspect [addresses]  Inspect data structure
+        -I --inspectDeep <deep>   Inspect maxVals (default 5)
+        -p, --pretty              Output prettyfied JSON chunks (default)
+        -r, --raw                 Output raw JSON chunks
+        -b, --base64              Output base64-encoded JSON chunks
+        -n, --noExtraNewline      Don't output extra newline characters
+
+
+#### Usage from other languages
+
+As you can figure out, to take advantage of xs2jiter from other languages, you
+can simply invoke its cli tool and parse its output.
+
+But... How do you handle asincrony?
+
+You actually don't need to do that: xs2jiter console tool outputs a blank line
+after each item to make easier to visually detect boundarys. For automated
+parsing you can disable it with *-n* modifier and to avoid fake positives
+because of possible newlines in json data, use *base64* output to ensure the
+only newlines are actual register separators.
+
+**Example written in PHP:**
+
+    <?php
+    $p = popen('xs2jiter -bn /path/to/file.xml', 'r');
+    while (false !== $str = fgets($p)) {
+        $data = json_decode(base64_decode($str));
+        // Do something with $data
+    };
+    ?>
+
+
+### <a name="asalibrary"></a>As a library
+
+#### Install
 
     npm install --save xs2jiter
 
 
-### Syntax
+#### Syntax
 
     var x2j = require("xs2jiter");
     var data = x2j(xml [, maxBufferLength]);
@@ -75,7 +134,7 @@ Usage
         // data.header -> Header information (container tag attributes).
 
 
-#### Parameters:
+##### Parameters:
 
   * *xml:* XML stream or string.
   * *maxBufferLength:* Specify the internal elements buffer length (Default is 50).
@@ -87,7 +146,7 @@ Usage
 > varies (typically because too different object lengths)
 
 
-#### Return value
+##### Return value
 
 Singleton iterable with *header* property.
 
@@ -96,14 +155,14 @@ Singleton iterable with *header* property.
 ...but it has also additional interesting properties and methods:
 
 
-##### header
+###### header
 
 Header information (attributes of the document container tag).
 
 
 
 
-#### Array-Like methods:
+##### Array-Like methods:
 
 Following array-like methods are also supprted. They work like its Array
 equivalents but returns an iterator instead of an array. For more information
@@ -116,7 +175,7 @@ documentation.
 
 
 
-### Example
+#### Example
 
     var x2j = require("xs2jiter");
     var xml = Fs.createReadStream("path/to/file.xml");
