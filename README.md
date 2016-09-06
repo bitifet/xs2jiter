@@ -113,7 +113,7 @@ only newlines are actual register separators.
     <?php
     $p = popen('xs2jiter -bn /path/to/file.xml', 'r');
     while (false !== $str = fgets($p)) {
-        $data = json_decode(base64_decode($str));
+        $data = json_decode(base64_decode($str), true);
         // Do something with $data
     };
     ?>
