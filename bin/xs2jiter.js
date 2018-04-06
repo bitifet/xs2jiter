@@ -22,7 +22,9 @@
 //
 // ////////////////////////////////////////////////////////////////////////
 "use strict";
-var x2j = require("../lib/xs2jiter.js");
+const x2j = require("../lib/xs2jiter.js");
+const defaultInspectionDeep = 5;
+const defaultFilter = "pretty";
 
 
 module.exports = x2j;
@@ -40,13 +42,14 @@ function main(){
         .version(pkg.version)
         .description(pkg.description)
         .usage("[options] [ inputFile ] [, outputFile ]")
-        //.option('-i, --integer <n>', 'An integer argument', parseInt)
-        .option("-i --inspect [addresses]", "Inspect data structure", list)
-        .option("-I --inspectDeep <deep>", "Inspect maxVals (default 5)", parseInt)
         .option("-p, --pretty", "Output prettyfied JSON chunks (default)")
         .option("-r, --raw", "Output raw JSON chunks")
         .option("-b, --base64", "Output base64-encoded JSON chunks")
         .option("-n, --noExtraNewline", "Don't output extra newline characters")
+        .option("-a, --Array", "Generate valid JSON-Array output.")
+        .option("-i --inspect", "Inspect data structure")
+        .option("-D --iDeep <deep>", "Maximum sample values per item (default 5)", parseInt)
+        .option("-A --iPick <addresses>", "Adresses to pick whole distinct values (ie: foo.bar,foo.baz) on inspection", list)
         .parse(process.argv)
     ;
 
@@ -64,7 +67,11 @@ function main(){
 
     var oFilters = {
         base64: function(data){
-            return new Buffer(JSON.stringify(data)).toString('base64');
+            var b64 = new Buffer(JSON.stringify(data)).toString('base64');
+            return program.Array
+                ? '"' + b64 + '"'
+                : b64
+            ;
         },
         pretty: function(data){
             return JSON.stringify(data, null, 4);
@@ -76,30 +83,46 @@ function main(){
 
 
     if (program.inspect) {
-        console.error("Analyzing data");
-        console.error("==============");
-        console.error("  More info at https://www.npmjs.com/package/inspectorslack");
+        console.error("==================================================================");
+        console.error("  ___ Analyzing data ___");
+        console.error("  HINTS:");
+        console.error("    * Use -D <deep> to set maximum sample values per item.");
+        console.error("    * Use -A <address>[,<address>...] to get all distinct values");
+        console.error("      of given items.");
+        console.error("    * More info at https://www.npmjs.com/package/inspectorslack");
         console.error("  Please Wait...");
+        console.error("==================================================================");
+        console.error("");
         console.log(
             require("inspectorslack")(js
-                , program.inspect
-                , program.inspectDeep
+                , program.iPick || ""
+                , program.iDeep || defaultInspectionDeep
             ).join("\n")
         );
     } else {
-        var filtered = false;
+        let filter = oFilters[defaultFilter];
         for (let f in oFilters) {
             if (program[f]) {
-                js = js.map(oFilters[f]);
-                filtered = true;
+                filter = oFilters[f];
+                break;
             };
         };
-        if(! filtered) js = js.map(oFilters.pretty);
+        js = js.map(filter);
 
+        if (program.Array) oFile.write("[");
+        let addComma;
         for (var j of js) {
-            if (! program.noExtraNewline) oFile.write("\n");
-            oFile.write(j+"\n");
+            if (addComma) oFile.write(",");
+            if (addComma === undefined) {
+                addComma = program.Array;
+            } else if (! program.noExtraNewline) {
+                oFile.write("\n");
+            };
+            oFile.write("\n");
+            oFile.write(j);
         };
+        oFile.write("\n");
+        if (program.Array) oFile.write("]");
     };
 
 };
