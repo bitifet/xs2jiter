@@ -181,6 +181,7 @@ documentation.
 #### Example
 
     var x2j = require("xs2jiter");
+    var Fs = require("fs");
     var xml = Fs.createReadStream("path/to/file.xml");
 
     var data = x2j(xml);
