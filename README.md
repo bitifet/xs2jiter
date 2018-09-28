@@ -7,6 +7,33 @@ xs2jIter
 > Convert XML to JSON and iterate over its top-level elements.
 
 
+Índex
+-----
+
+<!-- vim-markdown-toc GitLab -->
+
+* [Abstract](#abstract)
+* [Usage](#usage)
+    * [As a command-line tool](#as-a-command-line-tool)
+        * [Install](#install)
+        * [Console Usage](#console-usage)
+        * [Usage from other languages](#usage-from-other-languages)
+    * [As a library](#as-a-library)
+        * [Install](#install-1)
+        * [Syntax](#syntax)
+            * [Parameters:](#parameters)
+            * [Return value](#return-value)
+                * [header](#header)
+            * [Array-Like methods:](#array-like-methods)
+        * [Example](#example)
+* [Contributing](#contributing)
+
+<!-- vim-markdown-toc -->
+
+
+Abstract
+--------
+
 XML is a polymorphic data format able to mix multiple kinds of data with
 different structures in a single file (or stream). But, in fact, it is often
 used to share simple arrays of objects with the same or similar structure which
@@ -63,7 +90,7 @@ Conversion to JSON is done following the specification of
 Usage
 -----
 
-### <a name="asaclitool"></a>As a command-line tool
+### As a command-line tool
 
 Even designed as a javascript library to handle large XML files asynchronously
 (see [usage as a library](#asalibrary)) xs2jiter can also be used as command
@@ -124,7 +151,7 @@ only newlines are actual register separators.
     ?>
 
 
-### <a name="asalibrary"></a>As a library
+### As a library
 
 #### Install
 
@@ -198,8 +225,8 @@ documentation.
 
 
 
-<a name="contributing"></a>Contributing
----------------------------------------
+Contributing
+------------
 
 If you are interested in contributing with this project, you can do it in many ways:
 
