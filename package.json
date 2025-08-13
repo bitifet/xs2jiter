@@ -7,7 +7,11 @@
       "xs2jiter": "./bin/xs2jiter.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/**/*.spec.js"
+  },
+  "devDependencies": {
+    "mocha": "^10.0.0",
+    "nyc": "^15.0.0"
   },
   "repository": {
     "type": "git",
