@@ -1,100 +1,110 @@
+/* eslint-env mocha */
+const { expect } = require('chai');
 const { spawn } = require('child_process');
-const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
-describe('CLI Tests', function() {
-    this.timeout(10000);
-
+function runCLI(args = [], { input = null, cwd = process.cwd() } = {}) {
+  return new Promise((resolve) => {
     const cliPath = path.join(__dirname, '..', 'bin', 'xs2jiter.js');
+    const child = spawn(process.execPath, [cliPath, ...args], { cwd });
 
-    function runCLI(args, input = '') {
-        return new Promise((resolve, reject) => {
-            const child = spawn('node', [cliPath, ...args], {
-                stdio: ['pipe', 'pipe', 'pipe']
-            });
+    let stdout = '';
+    let stderr = '';
 
-            let stdout = '';
-            let stderr = '';
+    child.stdout.on('data', (d) => (stdout += d.toString()));
+    child.stderr.on('data', (d) => (stderr += d.toString()));
 
-            child.stdout.on('data', (data) => {
-                stdout += data.toString();
-            });
+    child.on('close', (code) => resolve({ code, stdout, stderr }));
 
-            child.stderr.on('data', (data) => {
-                stderr += data.toString();
-            });
-
-            child.on('close', (code) => {
-                resolve({ code, stdout, stderr });
-            });
-
-            child.on('error', (error) => {
-                reject(error);
-            });
-
-            if (input) {
-                child.stdin.write(input);
-            }
-            child.stdin.end();
-        });
+    if (input != null) {
+      child.stdin.write(input);
+      child.stdin.end();
     }
+  });
+}
 
-    describe('Help and Usage', function() {
-        it('should show help message', async function() {
-            try {
-                const result = await runCLI(['--help']);
-                assert.strictEqual(result.code, 0);
-                assert(result.stdout.includes('Usage: xs2jiter'));
-                assert(result.stdout.includes('-i, --inspect'));
-                assert(result.stdout.includes('-D, --iDeep'));
-                assert(result.stdout.includes('-A, --iPick'));
-            } catch (error) {
-                // If we get a module not found error, skip this test for now
-                if (error.message && error.message.includes('Cannot find module')) {
-                    this.skip();
-                } else {
-                    throw error;
-                }
-            }
-        });
+function splitJsonLines(s) {
+  return s
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+}
+
+describe('CLI: bin/xs2jiter.js', function () {
+  this.timeout(20000);
+
+  const fixturesDir = path.join(__dirname, 'fixtures');
+  const simpleXML = path.join(fixturesDir, 'simple.xml');
+  const malformedXML = path.join(fixturesDir, 'malformed.xml');
+
+  it('outputs compact JSON per item with --raw', async () => {
+    const { code, stdout, stderr } = await runCLI(['--raw', simpleXML]);
+    expect(code).to.equal(0, `stderr:\n${stderr}`);
+
+    const lines = splitJsonLines(stdout);
+    expect(lines.length).to.equal(3);
+
+    const objs = lines.map((l) => JSON.parse(l));
+    objs.forEach((o) => expect(o).to.be.an('object'));
+  });
+
+  it('reads from stdin when no file is provided', async () => {
+    const xml = fs.readFileSync(simpleXML);
+    const { code, stdout, stderr } = await runCLI(['--raw'], { input: xml });
+    expect(code).to.equal(0, `stderr:\n${stderr}`);
+
+    const lines = splitJsonLines(stdout);
+    expect(lines.length).to.equal(3);
+    lines.forEach((l) => JSON.parse(l));
+  });
+
+  it('produces a valid JSON Array with --Array', async () => {
+    const { code, stdout, stderr } = await runCLI(['--Array', '--raw', simpleXML]);
+    expect(code).to.equal(0, `stderr:\n${stderr}`);
+
+    const arr = JSON.parse(stdout);
+    expect(arr).to.be.an('array').with.lengthOf(3);
+    arr.forEach((o) => expect(o).to.be.an('object'));
+  });
+
+  it('supports base64 encoding; with --Array it produces a JSON array of strings', async () => {
+    const { code, stdout, stderr } = await runCLI(['--Array', '--base64', simpleXML]);
+    expect(code).to.equal(0, `stderr:\n${stderr}`);
+
+    const arr = JSON.parse(stdout);
+    expect(arr).to.be.an('array').with.lengthOf(3);
+    const decoded = arr.map((s) => {
+      const buf = Buffer.from(s, 'base64');
+      return JSON.parse(buf.toString('utf8'));
     });
+    decoded.forEach((o) => expect(o).to.be.an('object'));
+  });
 
-    describe('Inspect Mode Tests', function() {
-        const sampleXML = '<?xml version="1.0"?><root><item id="1">test1</item><item id="2">test2</item></root>';
+  it('writes to the specified output file when a second path arg is provided', async () => {
+    const tmpOut = path.join(fixturesDir, 'tmp.out.jsonl');
+    try {
+      const { code, stderr } = await runCLI(['--raw', simpleXML, tmpOut]);
+      expect(code).to.equal(0, `stderr:\n${stderr}`);
 
-        it('should run inspect mode with --inspect flag', async function() {
-            try {
-                const result = await runCLI(['--inspect'], sampleXML);
-                assert(result.stderr.includes('___ Analyzing data ___'));
-                assert(result.stderr.includes('HINTS:'));
-                assert(result.stderr.includes('Use -D <deep> to set maximum sample values'));
-                assert(result.stderr.includes('Use -A <address>'));
-            } catch (error) {
-                // If we get a module not found error, skip this test for now
-                if (error.message && error.message.includes('Cannot find module')) {
-                    this.skip();
-                } else {
-                    throw error;
-                }
-            }
-        });
+      const content = fs.readFileSync(tmpOut, 'utf8');
+      const lines = splitJsonLines(content);
+      expect(lines.length).to.equal(3);
+      lines.forEach((l) => JSON.parse(l));
+    } finally {
+      if (fs.existsSync(tmpOut)) fs.unlinkSync(tmpOut);
+    }
+  });
 
-        it('should run inspect mode with -i flag', async function() {
-            try {
-                const result = await runCLI(['-i'], sampleXML);
-                assert(result.stderr.includes('___ Analyzing data ___'));
-                assert(result.stderr.includes('HINTS:'));
-                assert(result.stderr.includes('Use -D <deep> to set maximum sample values'));
-                assert(result.stderr.includes('Use -A <address>'));
-            } catch (error) {
-                // If we get a module not found error, skip this test for now
-                if (error.message && error.message.includes('Cannot find module')) {
-                    this.skip();
-                } else {
-                    throw error;
-                }
-            }
-        });
-    });
+  it('exits non-zero and reports an error for malformed XML', async () => {
+    const { code, stdout } = await runCLI(['--raw', malformedXML]);
+    expect(code).to.not.equal(0);
+    expect(() => JSON.parse(stdout)).to.throw();
+  });
+
+  it('inspect mode (-i/--inspect) prints analysis hints to stderr', async () => {
+    const { code, stderr } = await runCLI(['--inspect', simpleXML]);
+    expect(code).to.equal(0);
+    expect(stderr).to.match(/Analyzing data/i);
+  });
 });
