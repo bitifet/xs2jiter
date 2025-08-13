@@ -121,9 +121,9 @@ $ xs2jiter.js -h
     -b, --base64            Output base64-encoded JSON chunks
     -n, --noExtraNewline    Don't output extra newline characters
     -a, --Array             Generate valid JSON-Array output.
-    -i --inspect            Inspect data structure
-    -D --iDeep <deep>       Maximum sample values per item (default 5)
-    -A --iPick <addresses>  Adresses to pick whole distinct values (ie: foo.bar,foo.baz) on inspection
+    -i, --inspect            Inspect data structure
+    -D, --iDeep <deep>       Maximum sample values per item (default 5)
+    -A, --iPick <addresses>  Adresses to pick whole distinct values (ie: foo.bar,foo.baz) on inspection
 ```
 
 
