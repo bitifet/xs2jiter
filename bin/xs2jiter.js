@@ -58,7 +58,7 @@ function main(){
         : process.stdin
     ;
 
-    var oFile = program.args[1] // Input file (default <STDIN>)
+    var oFile = program.args[1] // Output file (default <STDOUT>)
         ? Fs.createWriteStream(program.args[1])
         : process.stdout
     ;
