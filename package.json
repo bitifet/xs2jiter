@@ -4,14 +4,10 @@
   "description": "XML Stream to JSON Iterator - Convert XML to JSON and iterate over its top-level elements.",
   "main": "lib/xs2jiter.js",
   "bin": {
-      "xs2jiter": "./bin/xs2jiter.js"
+    "xs2jiter": "./bin/xs2jiter.js"
   },
   "scripts": {
-    "test": "mocha test/**/*.spec.js"
-  },
-  "devDependencies": {
-    "mocha": "^10.0.0",
-    "nyc": "^15.0.0"
+    "test": "nyc -r text -r lcov mocha \"test/**/*.spec.js\""
   },
   "repository": {
     "type": "git",
@@ -37,5 +33,24 @@
     "extend": "^3.0.0",
     "inspectorslack": "0.0.2",
     "node-expat": "^2.3.13"
+  },
+  "devDependencies": {
+    "chai": "^4.3.10",
+    "mocha": "^10.4.0",
+    "nyc": "^15.1.0"
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "lib/**/*.js",
+      "bin/**/*.js"
+    ],
+    "exclude": [
+      "test/**"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ]
   }
 }
