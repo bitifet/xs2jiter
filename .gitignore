@@ -1,3 +1,5 @@
 node_modules
 tests
 **/*.sw*
+.nyc_output
+coverage
