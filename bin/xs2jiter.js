@@ -47,9 +47,9 @@ function main(){
         .option("-b, --base64", "Output base64-encoded JSON chunks")
         .option("-n, --noExtraNewline", "Don't output extra newline characters")
         .option("-a, --Array", "Generate valid JSON-Array output.")
-        .option("-i --inspect", "Inspect data structure")
-        .option("-D --iDeep <deep>", "Maximum sample values per item (default 5)", parseInt)
-        .option("-A --iPick <addresses>", "Adresses to pick whole distinct values (ie: foo.bar,foo.baz) on inspection", list)
+        .option("-i, --inspect", "Inspect data structure")
+        .option("-D, --iDeep <deep>", "Maximum sample values per item (default 5)", parseInt)
+        .option("-A, --iPick <addresses>", "Adresses to pick whole distinct values (ie: foo.bar,foo.baz) on inspection", list)
         .parse(process.argv)
     ;
 
@@ -58,7 +58,7 @@ function main(){
         : process.stdin
     ;
 
-    var oFile = program.args[1] // Input file (default <STDIN>)
+    var oFile = program.args[1] // Output file (default <STDOUT>)
         ? Fs.createWriteStream(program.args[1])
         : process.stdout
     ;
@@ -67,7 +67,7 @@ function main(){
 
     var oFilters = {
         base64: function(data){
-            var b64 = new Buffer(JSON.stringify(data)).toString('base64');
+            var b64 = Buffer.from(JSON.stringify(data)).toString('base64');
             return program.Array
                 ? '"' + b64 + '"'
                 : b64
