@@ -102,7 +102,7 @@ describe('CLI: bin/xs2jiter.js', function () {
     expect(() => JSON.parse(stdout)).to.throw();
   });
 
-  it.skip('inspect mode (-i/--inspect) prints analysis hints to stderr (TODO: enable after fixing CLI flags)', async () => {
+  it('inspect mode (-i/--inspect) prints analysis hints to stderr', async () => {
     const { code, stderr } = await runCLI(['--inspect', simpleXML]);
     expect(code).to.equal(0);
     expect(stderr).to.match(/Analyzing data/i);
