@@ -32,7 +32,7 @@ module.exports = x2j;
 if(module.parent === null) main();
 
 
-function main(){
+async function main(){
     var pkg = require("../package.json");
     var Fs = require("fs");
     var program = require("commander");
@@ -67,7 +67,7 @@ function main(){
 
     var oFilters = {
         base64: function(data){
-            var b64 = new Buffer(JSON.stringify(data)).toString('base64');
+            var b64 = Buffer.from(JSON.stringify(data)).toString('base64');
             return program.Array
                 ? '"' + b64 + '"'
                 : b64
@@ -93,8 +93,10 @@ function main(){
         console.error("  Please Wait...");
         console.error("==================================================================");
         console.error("");
+        var allItems = [];
+        for await (var item of js) allItems.push(item);
         console.log(
-            require("inspectorslack")(js
+            require("inspectorslack")(allItems
                 , program.iPick || ""
                 , program.iDeep || defaultInspectionDeep
             ).join("\n")
@@ -111,7 +113,7 @@ function main(){
 
         if (program.Array) oFile.write("[");
         let addComma;
-        for (var j of js) {
+        for await (var j of js) {
             if (addComma) oFile.write(",");
             if (addComma === undefined) {
                 addComma = program.Array;

@@ -23,7 +23,7 @@ xs2jIter
         * [Syntax](#syntax)
             * [Parameters:](#parameters)
             * [Return value](#return-value)
-                * [header](#header)
+                * [getHeader](#getheader)
             * [Array-Like methods:](#array-like-methods)
         * [Example](#example)
 * [Contributing](#contributing)
@@ -52,16 +52,16 @@ of abovementioned array-like files due to its rapidly increase of memory
 requirements or even, in worst cases, ending up in out of memory issues when,
 in fact, you only were trying to convert long list of items to JSON array.
 
-> With *xs2jIter* you can stream those array-like files and igerate over each
-> asynchronously JSON encoded item not bothering on memory issues bacause
+> With *xs2jIter* you can stream those array-like files and iterate over each
+> asynchronously JSON encoded item not bothering on memory issues because
 > conversion is done asynchronously.
 
 To do that, xs2jIter expects an XML as its only parameter which can be provided
-both as string or thought a stream and returns an iterable object you can
-simply iterate (in a synchronous-like way) while input data is actually parsed
+both as string or through a stream and returns an async iterable you can
+iterate with `for await...of` while input data is actually parsed
 asynchronously.
 
-Parsing is done though [node-expat](https://www.npmjs.com/package/node-expat)
+Parsing is done through [node-expat](https://www.npmjs.com/package/node-expat)
 and is expected to have an optional DTD and a single top-level tag containing
 the array of tags (with fully free structure) over which we will iterate.
 
@@ -69,8 +69,8 @@ That is:
 
   * 0-Level: Single container (document) tag.
     - Tag name doesn't care.
-    - Tag attributes are threated as heading information and can be accessed
-      tought *header* attribute of the returned iterable.
+    - Tag attributes are treated as heading information and can be accessed
+      through the *getHeader()* method of the returned async iterable.
     - If there are more top-level elements, they will be ignored.
   * 1-Level: Array of tags:
     - Tag name:
@@ -160,10 +160,12 @@ only newlines are actual register separators.
 
 #### Syntax
 
-    var x2j = require("xs2jiter");
-    var data = x2j(xml [, maxBufferLength]);
-        // data        -> Iterable (once) over the whole items.
-        // data.header -> Header information (container tag attributes).
+    import x2j from "xs2jiter";
+    // or: const x2j = require("xs2jiter");
+
+    const data = x2j(xml [, maxBufferLength]);
+        // data          -> Async iterable over the whole items.
+        // data.getHeader -> Async function resolving to [tagName, attrs].
 
 
 ##### Parameters:
@@ -180,46 +182,48 @@ only newlines are actual register separators.
 
 ##### Return value
 
-Singleton iterable with *header* property.
+Async iterable (usable with `for await...of`) with a *getHeader()* method.
 
-    for (var j of data) {...};
+    for await (const item of data) {...};
 
-...but it has also additional interesting properties and methods:
+...but it has also additional properties and methods:
 
 
-###### header
+###### getHeader()
 
-Header information (attributes of the document container tag).
+Returns a Promise that resolves to `[tagName, attrs]` — the tag name and
+attributes of the document container tag (root element). Must be called
+before iterating.
 
 
 ##### Array-Like methods:
 
-Following array-like methods are also supprted. They work like its Array
-equivalents but returns an iterator instead of an array. For more information
-see [abuffer](https://www.npmjs.com/package/abuffer#array-like-methods)
-documentation.
+The async iterable also supports the following array-like methods, which
+return a new async iterable (not an array):
 
-  * buff.map(cbk [, thisArg])
+  * data.map(cbk [, thisArg])
 
-  * buff.filter(cbk [,thisArg])
+  * data.filter(cbk [, thisArg])
 
 
 
 #### Example
 
-    var x2j = require("xs2jiter");
-    var Fs = require("fs");
-    var xml = Fs.createReadStream("path/to/file.xml");
+    import x2j from "xs2jiter";
+    import Fs from "fs";
 
-    var data = x2j(xml);
+    const xml = Fs.createReadStream("path/to/file.xml");
+    const data = x2j(xml);
+
+    const [rootTag, rootAttrs] = await data.getHeader();
 
     console.log("=================================");
-    console.log(data.header);
+    console.log(rootTag, rootAttrs);
     console.log("=================================");
 
-    for (var j of data) {
+    for await (const item of data) {
         console.log("---------------------------------");
-        console.log(JSON.stringify(j, null, 4));
+        console.log(JSON.stringify(item, null, 4));
     };
 
 
